@@ -8,12 +8,14 @@ public class animationStateController : MonoBehaviour
     int isWalkingHash;
     int isJumpingHash;
     int isPunchingHash;
+    int isRunningHash;
     void Start()
     {
         animator = GetComponent<Animator>();   
         isWalkingHash = Animator.StringToHash("isWalking");
         isJumpingHash = Animator.StringToHash("isJumping");
         isPunchingHash = Animator.StringToHash("isPunching");
+        isRunningHash = Animator.StringToHash("isRunning");
     }
 
     void Update()
@@ -21,18 +23,19 @@ public class animationStateController : MonoBehaviour
         ProcessWalk();
         ProcessJump();
         ProcessPunch();
+        ProcessRun();
     }
 
     void ProcessWalk()
     {
         bool isWalking = animator.GetBool(isWalkingHash);
-        bool forwardPressed = Input.GetKey("d");
+        float moveZ = Input.GetAxis("Horizontal");
 
-        if(!isWalking && forwardPressed)
+        if(!isWalking && moveZ != 0)
         {
             animator.SetBool(isWalkingHash, true);
         }
-        else if(isWalking && !forwardPressed)
+        else if(isWalking && moveZ == 0)
         {
             animator.SetBool(isWalkingHash, false);
         }
@@ -67,6 +70,22 @@ public class animationStateController : MonoBehaviour
         if(animator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1)
         {
             animator.SetBool(isPunchingHash, false);
+        }
+    }
+
+    void ProcessRun()
+    {
+        bool isWalking = animator.GetBool(isWalkingHash);
+        bool isRunning = animator.GetBool(isRunningHash);
+        bool shiftPressed = Input.GetKey(KeyCode.LeftShift);
+
+        if(isWalking && !isRunning && shiftPressed)
+        {
+            animator.SetBool(isRunningHash, true);
+        }
+        else if(isRunning && !shiftPressed)
+        {
+            animator.SetBool(isRunningHash, false);
         }
     }
 }
